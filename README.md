@@ -3,7 +3,7 @@
 
 ## Introduction
 
-I?ve always been fascinated by cryptography and privacy in computing. My journey began with an understanding of Pretty Good Privacy (PGP), where I delved into data signing and verification processes. With the rise of blockchain technologies and secure communications, my interest in understanding how Zero Knowledge Proof (ZKP) algorithms work was piqued. As I began to dive into online resources, it became clear that implementing such an algorithm would be an exciting and educational project..
+I've always been fascinated by cryptography and privacy in computing. My journey began with an understanding of Pretty Good Privacy (PGP), where I delved into data signing and verification processes. With the rise of blockchain technologies and secure communications, my interest in understanding how Zero Knowledge Proof (ZKP) algorithms work was piqued. As I began to dive into online resources, it became clear that implementing such an algorithm would be an exciting and educational project..
 
 I wanted my implementation to be as close to reality as possible, mirroring real-world scenarios where two separate participants, the Prover and the Verifier, interact across different servers. Additionally, the separation of participants provided me with an opportunity to develop the solution with two different programming languages, providing a more complex and realistic setup.
 
@@ -29,11 +29,11 @@ The use of two different programming languages for the Prover and Verifier compo
 
 In implementing the Fiat-Shamir Zero Knowledge Proof algorithm, I adhered closely to the original specification, with a few necessary adaptations to accommodate the messaging system. Specifically, some values that would typically be communicated between participants were instead hard-coded directly into the application. This decision simplified the development process without compromising the integrity of the simulation.
 
-I've deliberately chosen small numbers for the hard-coded values to make the calculations more tractable and the outputs easier to interpret. In a real-world application, these numbers would be significantly larger to ensure robust security. As explained in the [Wikipedia article on the Feige?Fiat?Shamir identification scheme](https://en.wikipedia.org/wiki/Feige%E2%80%93Fiat%E2%80%93Shamir_identification_scheme), _'n'_ should be the product of two large prime numbers, _'s'_ and _'r'_ should be less than _'n'_, and _'s'_ should be coprime to _'n'_. These conditions contribute to the security of the Fiat-Shamir protocol.
+I've deliberately chosen small numbers for the hard-coded values to make the calculations more tractable and the outputs easier to interpret. In a real-world application, these numbers would be significantly larger to ensure robust security. As explained in the [Wikipedia article on the Feige-Fiat-Shamir identification scheme](https://en.wikipedia.org/wiki/Feige%E2%80%93Fiat%E2%80%93Shamir_identification_scheme), _'n'_ should be the product of two large prime numbers, _'s'_ and _'r'_ should be less than _'n'_, and _'s'_ should be coprime to _'n'_. These conditions contribute to the security of the Fiat-Shamir protocol.
 
 The system performs 20 iterations, which, based on my research, should be sufficient to verify whether the Prover truly knows the secret. In practice, this number of iterations can be adjusted to meet specific security requirements.
 
-I have taken care to heavily comment the code to aid understanding for the reader (and for myself! ??). This approach will facilitate a more in-depth comprehension of the algorithm's functioning and the design choices made.
+I have taken care to heavily comment the code to aid understanding for the reader (and for myself! :smiley:). This approach will facilitate a more in-depth comprehension of the algorithm's functioning and the design choices made.
 
 
 ## The Fiat-Shamir Zero Knowledge Proof algorithm explained
@@ -55,19 +55,15 @@ Here's a simplified explanation of the algorithm:
 
 ![Challenge Phase](https://oscarpascual.com/challenge-phase.png)
 
-**Response Phase**: If the bit _'b'_ is 0, the prover sends _'r'_ back. If _'b'_ is 1, the prover sends _y = (r * s^b) mod n_ back.
+**Response Phase**: If the bit _'b'_ is 0, the prover sends _'r'_ back (since anything raised to the power of 0 is 1, and _'r'_ is less than _'n'_, the product of _'r'_ and 1 remains _'r'_ itself). If _'b'_ is 1, the prover sends _y = (r * s^b) mod n_ back.
 
 ![Response Phase](https://oscarpascual.com/response-phase.png)
 
-**Verification Phase**: The verifier checks if _y * y mod n_ is equal to _'x'_ (if _'b'_ was 0) or to _x * v^b mod n_ (if _'b'_ was 1). If the check passes, the verifier can be assured that the prover knows the secret s.
+**Verification Phase**: The verifier checks if _y * y mod n_ is equal to _'x'_ (if _'b'_ was 0) or to _x * v^b mod n_ (if _'b'_ was 1). If the check passes, the verifier can be assured that the prover knows the secret _s_.
 
 ![Verification Phase](https://oscarpascual.com/verification-phase.png)
 
 This algorithm is iterated several times to reduce the probability of a malicious prover successfully passing the verification without knowing the secret.
-
-
-
-
 
 
 ## Installation and Running
@@ -117,8 +113,8 @@ Please note that your actual output may vary due to the random nature of the Fia
 1. **Fiat-Shamir Heuristic**: The Wikipedia page offering a detailed explanation of the heuristic algorithm.
    - [Wikipedia: Fiat-Shamir Heuristic](https://en.wikipedia.org/wiki/Fiat%E2%80%93Shamir_heuristic)
 
-2. **Feige?Fiat?Shamir Identification Scheme**: The Wikipedia page offering a detailed explanation of the scheme.
-   - [Wikipedia: Feige?Fiat?Shamir Identification Scheme](https://en.wikipedia.org/wiki/Feige%E2%80%93Fiat%E2%80%93Shamir_identification_scheme)
+2. **Feige-Fiat-Shamir Identification Scheme**: The Wikipedia page offering a detailed explanation of the scheme.
+   - [Wikipedia: Feige-Fiat-Shamir Identification Scheme](https://en.wikipedia.org/wiki/Feige%E2%80%93Fiat%E2%80%93Shamir_identification_scheme)
 
 3. **Zero-Knowledge Proofs**: A comprehensive guide to Zero-Knowledge Proofs (ZKP).
    - [Wikipedia: Zero-Knowledge Proof](https://en.wikipedia.org/wiki/Zero-knowledge_proof)
