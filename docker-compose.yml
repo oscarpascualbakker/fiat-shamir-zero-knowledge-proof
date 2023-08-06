@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: test
+      RABBITMQ_DEFAULT_PASS: test
+
+  prover_python:
+    build:
+      context: ./prover_python
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./prover_python:/app
+
+  verifier_php:
+    build:
+      context: ./verifier_php
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./verifier_php:/app
+      - /app/vendor
