@@ -29,22 +29,24 @@ if ($attempts == $max_attempts) {
     exit;
 }
 
-
-// Specify total number of iterations of the protocol
-$passedTests = 0;
-$totalTests = 20;
-
-// Hardcode the values of 'n' and 'v' for simplicity
-$n = 235;
-$v = 89;
-
 // Create a new channel within this connection
 $channel = $connection->channel();
 
 // Declare queues for commitment, challenge, and response
+$channel->queue_declare('init',       false, false, false, false);
 $channel->queue_declare('commitment', false, false, false, false);
-$channel->queue_declare('challenge', false, false, false, false);
-$channel->queue_declare('response', false, false, false, false);
+$channel->queue_declare('challenge',  false, false, false, false);
+$channel->queue_declare('response',   false, false, false, false);
+
+// Define callback for receiving n and v values
+$n = null;
+$v = null;
+$callbackInit = function ($msg) use (&$n, &$v) {
+    $nv = json_decode($msg->body);
+    $n = $nv[0];
+    $v = $nv[1];
+    echo 'Received n: ', $n, ' and v: ', $v, "\n\n";
+};
 
 // Define callback function for receiving commitment messages
 $callbackCommitment = function ($msg) use (&$x) {
@@ -59,7 +61,7 @@ $callbackResponse = function ($msg) use (&$x, &$y, &$b, &$passedTests) {
     $y = (int) $msg->body;
     echo '  [x] Received response ', $y, "\n";
 
-    // Calculate check value (y^2 mod n)
+    // Calculate check value (y^2 mod n). This is done to verify the prover's response.
     $check = ($y * $y) % $n;
 
     if ($b == 1) {
@@ -77,6 +79,17 @@ $callbackResponse = function ($msg) use (&$x, &$y, &$b, &$passedTests) {
     }
 };
 
+// First, obtain 'n' and 'v' from the Prover
+$channel->basic_consume('init', '', false, true, false, false, $callbackInit);
+while (!isset($n) || !isset($v)) {
+    $channel->wait();
+}
+$channel->basic_cancel('init');
+
+// Specify total number of iterations of the protocol
+$passedTests = 0;
+$totalTests = 20;
+
 // Start 20 iterations of the protocol
 for ($i = 0; $i < $totalTests; $i++) {
     echo "Iteration: ", $i+1, "\n";
@@ -91,7 +104,7 @@ for ($i = 0; $i < $totalTests; $i++) {
     }
     $channel->basic_cancel('commitment');
 
-    // Step 2: Send the challenge message
+    // Step 2: Send the challenge message. The challenge 'b' is a random bit (0 or 1).
     $b = rand(0, 1);
     $msg = new AMQPMessage((string) $b);
     $channel->basic_publish($msg, '', 'challenge');

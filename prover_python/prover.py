@@ -1,10 +1,14 @@
 # Import libraries
 # Pika is a pure-Python implementation of the AMQP 0-9-1 protocol.
 # Random is a Python built-in library for generating pseudo-random numbers.
+# Time provides various time-related functions. In this code, it is used to introduce a delay between connection attempts to RabbitMQ.
+# Json provides methods to manipulate JSON data. In this code, it is used to convert a tuple of strings into a JSON string.
+# Sympy is a Python library for symbolic mathematics. It provides the 'randprime()' function, which generates a random prime number in a given range. In this code, 'randprime()' is used to generate two random prime numbers.
 import pika
 import random
 import time
-
+import json
+from sympy import randprime
 
 # Ensure the Prover has access to RabbitMQ.  This mechanism attempts to establish a
 # connection to RabbitMQ multiple times over a set duration.
@@ -35,22 +39,39 @@ if attempts == max_attempts:
     print("Max attempts reached. Could not establish a connection.")
     exit()
 
-
-# Specify total number of iterations of the protocol
-totalTests = 20
-
-
-# Define the secret 's' and a modulus 'n'.  'v' is then computed as the square of 's' modulo 'n'.
-# For simplicity, both 'n' and 'v' are hardcoded in the Verifier.
-s = 123
-n = 235
-v = (s * s) % n
-
 # Open a new channel with RabbitMQ.
 channel = connection.channel()
 
 # Declare a queue to receive the challenges.
 channel.queue_declare(queue='challenge')
+
+
+# Define a range for the prime numbers
+lower_bound = 10000
+upper_bound = 100000
+
+# Generate two random prime numbers 'p' and 'q' within the defined range
+p = randprime(lower_bound, upper_bound)
+q = randprime(lower_bound, upper_bound)
+
+# Calculate 'n' as product of 'p' and 'q'
+n = p * q
+
+# Generate random number 's' in the range of 2 and n-1
+s = random.randint(2, n-1)
+
+# Calculate 'v'
+v = (s * s) % n
+
+# Convert 'n' and 'v' to string and convert to json
+n_str = str(n)
+v_str = str(v)
+nv_json_str = json.dumps((n_str, v_str))
+
+# Send 'n' and 'v' to the Verifier through queue 'init'
+print(f"Sending 'n': {n} and 'v': {v} to Receiver\n", flush=True)
+channel.basic_publish(exchange='', routing_key='init', body=nv_json_str)
+
 
 # This closure creates and returns another function - 'callback', that has access to the argument 'r'.
 def make_callback(r):
@@ -60,7 +81,6 @@ def make_callback(r):
         b = int(body)
         y = (r * s ** b) % n
         print(f"  Received challenge: {b}.  Sending response: {y}", flush=True)
-        print("\n")
         channel.basic_publish(exchange='', routing_key='response', body=str(y))
         channel.basic_cancel(consumer_tag='challenge')
     return callback
@@ -74,6 +94,9 @@ def process_message(ch, method, properties, body):
 
 # Tell RabbitMQ that this function should receive messages from the 'challenge' queue.
 channel.basic_consume(queue='challenge', on_message_callback=process_message, auto_ack=True)
+
+# Specify total number of iterations of the protocol
+totalTests = 20
 
 # The main loop for the Prover side of the Fiat-Shamir protocol.
 for i in range(totalTests):
@@ -90,4 +113,4 @@ for i in range(totalTests):
     # Process data events to handle incoming messages.
     channel._process_data_events(time_limit=3)
 
-print("All iterations completed.", flush=True)
+print("\nAll iterations completed.", flush=True)
