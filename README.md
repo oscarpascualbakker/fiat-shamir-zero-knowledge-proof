@@ -27,9 +27,9 @@ The use of two different programming languages for the Prover and Verifier compo
 
 ## Algorithm Implementation
 
-In implementing the Fiat-Shamir Zero Knowledge Proof algorithm, I adhered closely to the original specification, with a few necessary adaptations to accommodate the messaging system. Specifically, some values that would typically be communicated between participants were instead hard-coded directly into the application. This decision simplified the development process without compromising the integrity of the simulation.
+In implementing the Fiat-Shamir Zero Knowledge Proof algorithm, I adhered closely to the original specification, with a few necessary adaptations to accommodate the messaging system. Specifically, values that need to be communicated between the Prover and the Verifier, such as _'n'_ and _'v'_, are sent as messages through RabbitMQ queues. This adaptation improves the overall simulation, providing a more accurate representation of how such a system would operate in real-world scenarios.
 
-I've deliberately chosen small numbers for the hard-coded values to make the calculations more tractable and the outputs easier to interpret. In a real-world application, these numbers would be significantly larger to ensure robust security. As explained in the [Wikipedia article on the Feige-Fiat-Shamir identification scheme](https://en.wikipedia.org/wiki/Feige%E2%80%93Fiat%E2%80%93Shamir_identification_scheme), _'n'_ should be the product of two large prime numbers, _'s'_ and _'r'_ should be less than _'n'_, and _'s'_ should be coprime to _'n'_. These conditions contribute to the security of the Fiat-Shamir protocol.
+To keep the simulation more manageable and the outputs easier to interpret, I've chosen a specific range for the generation of prime numbers _'p'_ and _'q'_, which are used to compute _'n'_. In a real-world application, these numbers would be significantly larger to ensure robust security. As explained in the [Wikipedia article on the Feige-Fiat-Shamir identification scheme](https://en.wikipedia.org/wiki/Feige%E2%80%93Fiat%E2%80%93Shamir_identification_scheme), _'n'_ should be the product of two large prime numbers, _'s'_ and _'r'_ should be less than _'n'_, and _'s'_ should be coprime to _'n'_. These conditions contribute to the security of the Fiat-Shamir protocol.
 
 The system performs 20 iterations, which, based on my research, should be sufficient to verify whether the Prover truly knows the secret. In practice, this number of iterations can be adjusted to meet specific security requirements.
 
@@ -47,7 +47,7 @@ Here's a simplified explanation of the algorithm:
 - _'n'_ is a composite number which is the product of two prime numbers. Both the Prover and Verifier are aware of _'n'_.
 - _'v'_ is a value calculated by the Prover as _v = (s * s) mod n_, which is then shared with the Verifier.
 
-**Commitment Phase**: The prover begins by choosing a secret value _'s'_ and computes _v = (s * s) mod n_, where _'n'_ is a composite number (preferably a product of two large primes). The value _'v'_ is sent to the verifier. The prover also chooses a random number _'r'_ and computes _x = (r * r) mod n_. This value _'x'_ is the commitment and is sent to the verifier.
+**Commitment Phase**: The prover begins by choosing a secret value _'s'_ and computes _v = (s * s) mod n_, where _'n'_ is a composite number (preferably a product of two large primes _'p'_ and _'q'_). The value _'v'_ is sent to the verifier. The prover also chooses a random number _'r'_ and computes _x = (r * r) mod n_. This value _'x'_ is the commitment and is sent to the verifier.
 
 ![Commitment Phase](https://oscarpascual.com/commitment-phase.png)
 
