@@ -71,7 +71,7 @@ v_str = str(v)
 nv_json_str = json.dumps((n_str, v_str))
 
 # Send 'n' and 'v' to the Verifier through queue 'init'
-print(f"Sending 'n': {n} and 'v': {v} to Receiver\n", flush=True)
+print(f"Sending 'n': {n} and 'v': {v} to Verifier\n", flush=True)
 channel.basic_publish(exchange='', routing_key='init', body=nv_json_str)
 
 

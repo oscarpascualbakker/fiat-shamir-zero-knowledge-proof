@@ -20,7 +20,7 @@ while($attempts < $max_attempts) {
     } catch (Exception $e) {
         echo "Attempt " . ($attempts + 1) . " failed. Retrying...\n";
         $attempts++;
-        sleep($wait_time); // Sleep for 5 seconds before the next attempt
+        sleep($wait_time); // Sleep 'wait_time' seconds before the next attempt
     }
 }
 
@@ -32,13 +32,13 @@ if ($attempts == $max_attempts) {
 // Create a new channel within this connection
 $channel = $connection->channel();
 
-// Declare queues for commitment, challenge, and response
-$channel->queue_declare('init',       false, false, false, false);
+// Declare queues for init, commitment, challenge and response
+$channel->queue_declare('init', false, false, false, false);
 $channel->queue_declare('commitment', false, false, false, false);
-$channel->queue_declare('challenge',  false, false, false, false);
-$channel->queue_declare('response',   false, false, false, false);
+$channel->queue_declare('challenge', false, false, false, false);
+$channel->queue_declare('response', false, false, false, false);
 
-// Define callback for receiving n and v values
+// Define callback for receiving 'n' and 'v' values
 $n = null;
 $v = null;
 $callbackInit = function ($msg) use (&$n, &$v) {
@@ -65,7 +65,7 @@ $callbackResponse = function ($msg) use (&$x, &$y, &$b, &$passedTests) {
     $check = ($y * $y) % $n;
 
     if ($b == 1) {
-        // Only if b=1, check must be done like this: y^2 mod n == x·v^b mod n and therefore, x must be adapted
+        // Only if b=1, check must be done like this: y^2 mod n == x * v^b mod n and therefore, x must be adapted
         // Otherwise check is simply y^2 mod n == x
         $x = ($x * $v) % $n;
     }
@@ -88,9 +88,7 @@ $channel->basic_cancel('init');
 
 // Specify total number of iterations of the protocol
 $totalTests = intval(getenv('TOTAL_TESTS')) ?: 20;
-
 $passedTests = 0;
-echo "Total de tests: $totalTests\n";
 
 # The main loop for the Verifier side of the Fiat-Shamir protocol.
 for ($i = 0; $i < $totalTests; $i++) {
