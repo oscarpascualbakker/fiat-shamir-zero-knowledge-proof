@@ -3,11 +3,13 @@
 # Random is a Python built-in library for generating pseudo-random numbers.
 # Time provides various time-related functions. In this code, it is used to introduce a delay between connection attempts to RabbitMQ.
 # Json provides methods to manipulate JSON data. In this code, it is used to convert a tuple of strings into a JSON string.
+# Os provides the getenv function.
 # Sympy is a Python library for symbolic mathematics. It provides the 'randprime()' function, which generates a random prime number in a given range. In this code, 'randprime()' is used to generate two random prime numbers.
 import pika
 import random
 import time
 import json
+import os
 from sympy import randprime
 
 # Ensure the Prover has access to RabbitMQ.  This mechanism attempts to establish a
@@ -95,8 +97,8 @@ def process_message(ch, method, properties, body):
 # Tell RabbitMQ that this function should receive messages from the 'challenge' queue.
 channel.basic_consume(queue='challenge', on_message_callback=process_message, auto_ack=True)
 
-# Specify total number of iterations of the protocol
-totalTests = 20
+# Specify total number of iterations of the protocol (configured in .env). Fallback to '20' if not set
+totalTests = int(os.getenv('TOTAL_TESTS') or '20')
 
 # The main loop for the Prover side of the Fiat-Shamir protocol.
 for i in range(totalTests):

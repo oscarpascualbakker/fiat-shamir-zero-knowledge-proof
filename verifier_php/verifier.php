@@ -87,10 +87,12 @@ while (!isset($n) || !isset($v)) {
 $channel->basic_cancel('init');
 
 // Specify total number of iterations of the protocol
-$passedTests = 0;
-$totalTests = 20;
+$totalTests = intval(getenv('TOTAL_TESTS')) ?: 20;
 
-// Start 20 iterations of the protocol
+$passedTests = 0;
+echo "Total de tests: $totalTests\n";
+
+# The main loop for the Verifier side of the Fiat-Shamir protocol.
 for ($i = 0; $i < $totalTests; $i++) {
     echo "Iteration: ", $i+1, "\n";
 
