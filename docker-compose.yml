@@ -17,6 +17,8 @@ services:
       - rabbitmq
     volumes:
       - ./prover_python:/app
+    environment:
+      - TOTAL_TESTS=${TOTAL_TESTS}
 
   verifier_php:
     build:
@@ -26,3 +28,5 @@ services:
     volumes:
       - ./verifier_php:/app
       - /app/vendor
+    environment:
+      - TOTAL_TESTS=${TOTAL_TESTS}

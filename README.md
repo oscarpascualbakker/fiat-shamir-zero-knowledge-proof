@@ -31,7 +31,7 @@ In implementing the Fiat-Shamir Zero Knowledge Proof algorithm, I adhered closel
 
 To keep the simulation more manageable and the outputs easier to interpret, I've chosen a specific range for the generation of prime numbers _'p'_ and _'q'_, which are used to compute _'n'_. In a real-world application, these numbers would be significantly larger to ensure robust security. As explained in the [Wikipedia article on the Feige-Fiat-Shamir identification scheme](https://en.wikipedia.org/wiki/Feige%E2%80%93Fiat%E2%80%93Shamir_identification_scheme), _'n'_ should be the product of two large prime numbers, _'s'_ and _'r'_ should be less than _'n'_, and _'s'_ should be coprime to _'n'_. These conditions contribute to the security of the Fiat-Shamir protocol.
 
-The system performs 20 iterations, which, based on my research, should be sufficient to verify whether the Prover truly knows the secret. In practice, this number of iterations can be adjusted to meet specific security requirements.
+The system performs a number of iterations defined by the TOTAL_TESTS environment variable in the .env file, with a default of 20 if not specified. This setup allows for flexibility in the number of iterations, which can be adjusted to meet specific security requirements. In practice, this number can be changed as needed. Based on my research, a minimum of 20 iterations should be sufficient to verify whether the Prover truly knows the secret.
 
 I have taken care to heavily comment the code to aid understanding for the reader (and for myself! :smiley:). This approach will facilitate a more in-depth comprehension of the algorithm's functioning and the design choices made.
 
