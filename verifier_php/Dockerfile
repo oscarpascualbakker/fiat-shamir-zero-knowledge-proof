@@ -18,5 +18,6 @@ COPY composer.json .
 RUN composer install
 
 COPY verifier.php .
+COPY .env .
 
 CMD ["php", "verifier.php"]

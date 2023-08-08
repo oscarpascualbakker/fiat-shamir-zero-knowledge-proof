@@ -1,2 +1,9 @@
+# Global
+/images/
+
+# Prover
+/prover_python/.env
+
+# Verifier
+/verifier_php/.env
 /verifier_php/vendor
-images/
